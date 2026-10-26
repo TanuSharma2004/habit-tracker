@@ -55,15 +55,17 @@ const authLimiter = rateLimit({
 });
 
 app.get("/", (req, res) =>
-  res.json({ message: "Expense Tracker API is running" }),
+  res.json({ message: "Habit Tracker API is running" }),
 );
 app.get("/health", (req, res) => res.json({ status: "ok" })); // used by Render's health check
 
-app.use("/api/auth", authLimiter, require("./routes/authRoutes"));
+// Rate limit only the routes where passwords can be guessed
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/habits", require("./routes/habitRoutes"));
 app.use("/api/checkins", require("./routes/checkinRoutes"));
 app.use("/api/stats", require("./routes/statsRoutes"));
-app.use("/api/transactions", require("./routes/transactionRoutes"));
 
 // Unknown routes
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));
