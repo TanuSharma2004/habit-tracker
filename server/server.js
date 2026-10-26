@@ -40,6 +40,10 @@ app.use(
   }),
 );
 app.use(express.json({ limit: "10kb" }));
+app.use((req, res, next) => {
+  req.body ??= {}; // newer Express leaves req.body undefined when a request has no body
+  next();
+});
 
 // 30 login/register attempts per IP per 15 minutes
 const authLimiter = rateLimit({
@@ -56,6 +60,7 @@ app.get("/", (req, res) =>
 app.get("/health", (req, res) => res.json({ status: "ok" })); // used by Render's health check
 
 app.use("/api/auth", authLimiter, require("./routes/authRoutes"));
+app.use("/api/habits", require("./routes/habitRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
 
 // Unknown routes
