@@ -62,6 +62,7 @@ app.get("/health", (req, res) => res.json({ status: "ok" })); // used by Render'
 app.use("/api/auth", authLimiter, require("./routes/authRoutes"));
 app.use("/api/habits", require("./routes/habitRoutes"));
 app.use("/api/checkins", require("./routes/checkinRoutes"));
+app.use("/api/stats", require("./routes/statsRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
 
 // Unknown routes

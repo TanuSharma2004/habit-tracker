@@ -1,4 +1,5 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
 const DAY_NAMES = [
   "Sundays",
   "Mondays",
@@ -21,15 +22,21 @@ const isValidDateString = (value) => {
 
 const toDateString = (ms) => new Date(ms).toISOString().slice(0, 10);
 
+// "2026-10-25" + 3 -> "2026-10-28" (negative numbers go back)
+const addDays = (dateString, n) =>
+  toDateString(Date.parse(`${dateString}T00:00:00.000Z`) + n * DAY_MS);
+
 // Weekday of a calendar date: 0 = Sunday ... 6 = Saturday (same in every time zone)
 const weekdayOf = (dateString) =>
   new Date(`${dateString}T00:00:00.000Z`).getUTCDay();
 
-// Latest date we accept is "now" in UTC+14, the furthest-ahead time zone,
-// so nobody gets rejected on their own "today"
-const latestAllowed = () => toDateString(Date.now() + 14 * 60 * 60 * 1000);
+// Latest "today" anyone can have: the date in UTC+14, the furthest-ahead time zone
+const latestAllowed = () => toDateString(Date.now() + 14 * HOUR_MS);
 
-// Earliest date: a year back, plus one day of slack for time zones
+// Earliest "today" anyone can have: the date in UTC-12, the furthest-behind time zone
+const earliestToday = () => toDateString(Date.now() - 12 * HOUR_MS);
+
+// Earliest date a check-in may have: a year back, plus one day of slack for time zones
 const earliestAllowed = () =>
   toDateString(Date.now() - (MAX_BACKFILL_DAYS + 1) * DAY_MS);
 
@@ -44,8 +51,11 @@ module.exports = {
   MAX_BACKFILL_DAYS,
   MAX_RANGE_DAYS,
   isValidDateString,
+  toDateString,
+  addDays,
   weekdayOf,
   latestAllowed,
+  earliestToday,
   earliestAllowed,
   spanInDays,
 };
